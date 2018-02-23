@@ -16,9 +16,4 @@ And copy "Access Key" and "Secret Access Key" and it will using in your java cod
 
 Create one Maven Project in any Eclipse and add this below one dependency:
 
-<dependency>
-    <groupId>com.amazonaws</groupId>
-    <artifactId>aws-java-sdk</artifactId>
-    <version>1.9.2</version>
-</dependency>
 
