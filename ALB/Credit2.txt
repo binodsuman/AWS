@@ -1,0 +1,6 @@
+#! /bin/bash
+sudo su
+yum install httpd -y
+echo "<html><h1>This is Credit Card Processing Second Server</h1></html>" > /var/www/html/index.html
+echo "<html><h1>Please wait, we are processing your credit card transaction from Credit server Second </h1></html>" > /var/www/html/credit.html
+service httpd start
