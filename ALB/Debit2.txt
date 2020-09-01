@@ -1,0 +1,6 @@
+#! /bin/bash
+sudo su
+yum install httpd -y
+echo "<html><h1>This is Debit Card Processing Second Server</h1></html>" > /var/www/html/index.html
+echo "<html><h1>Please wait, we are processing your debit card transaction from Debit server Second </h1></html>" > /var/www/html/debit.html
+service httpd start
