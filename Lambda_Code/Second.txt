@@ -1,0 +1,43 @@
+import json
+import boto3
+import os
+
+# boto3 S3 initialization
+s3_client = boto3.client("s3")
+
+def lambda_handler(event, context):
+   destination_bucket_text = 'binod-s3-text'
+   destination_bucket_jpg = 'binod-s3-jpg'
+   destination_bucket_pdf = 'binod-s3-pdf'
+
+   source_bucket_name = event['Records'][0]['s3']['bucket']['name']
+   file_key_name = event['Records'][0]['s3']['object']['key']
+   copy_source_object = {'Bucket': source_bucket_name, 'Key':file_key_name}
+
+
+   extension = os.path.splitext(file_key_name)[1] 
+   print("Binod File Extension :",extension)
+   print("Binod soruce bucket :",source_bucket_name)
+   print("Binod file_key_key ",file_key_name)
+   print("Binod copy_source_object :",copy_source_object)
+
+   #CloudWatch Info
+   print("Binod Log Stream name :", context.log_stream_name)
+   print("Binod Log group name :", context.log_group_name)
+   print("Binod Request ID ", context.aws_request_id)
+  
+   # event contains all information about uploaded object
+   print("Event :", event)
+   
+     
+ 
+   # S3 copy object operation
+   if extension==".txt":
+       s3_client.copy_object(CopySource=copy_source_object, Bucket=destination_bucket_text, Key=file_key_name)
+       print("Binod File copied to Text S3")
+   if extension==".jpg":
+       s3_client.copy_object(CopySource=copy_source_object, Bucket=destination_bucket_jpg, Key=file_key_name)
+       print("Binod File copied to JPG S3")
+   if extension==".pdf":
+       s3_client.copy_object(CopySource=copy_source_object, Bucket=destination_bucket_pdf, Key=file_key_name)
+       print("Binod File copied to PDF S3")

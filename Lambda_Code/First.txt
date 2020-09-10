@@ -1,0 +1,43 @@
+1. Create IAM s3full and Lambda permission
+2. Create two s3 source and destination
+3. Create lambda function as below.
+4. Drop file in source S3
+5. Go to see Destination S3 
+6. Go to Cloud watch and see logs.
+
+
+import json
+import boto3
+
+# boto3 S3 initialization
+s3_client = boto3.client("s3")
+
+def lambda_handler(event, context):
+   destination_bucket_name = 'binod-s3-destination'
+   source_bucket_name = event['Records'][0]['s3']['bucket']['name']
+   file_key_name = event['Records'][0]['s3']['object']['key']
+   copy_source_object = {'Bucket': source_bucket_name, 'Key':file_key_name}
+
+   print("Binod soruce bucket :",source_bucket_name)
+   print("Binod file_key_key ",file_key_name)
+   print("Binod copy_source_object :",copy_source_object)
+
+   #CloudWatch Info
+   print("Binod Log Stream name :", context.log_stream_name)
+   print("Binod Log group name :", context.log_group_name)
+   print("Binod Request ID ", context.aws_request_id)
+  
+   # event contains all information about uploaded object
+   print("Event :", event)
+ 
+   # S3 copy object operation
+   s3_client.copy_object(CopySource=copy_source_object, Bucket=destination_bucket_name, Key=file_key_name)
+ 
+   return {
+    'statusCode': 200,
+    'body': json.dumps('Hello from S3 events Lambda!')
+   }
+
+import os
+destination_bucket_name = 'binod-s3-destination'
+destination_bucket_name = os.environ['DESTINATION3FOLDER']
