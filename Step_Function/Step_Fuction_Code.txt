@@ -1,0 +1,111 @@
+--------------
+
+Role for Lambda (LambdaBasic and cloudwatchfull)
+Role for step function
+
+First lambda
+
+import json
+
+def lambda_handler(event, context):
+    # TODO implement
+    input_param = {
+        "carName" : "Honda",
+        "condition" : "good",
+        "howold" : "5"
+    }
+    print("responseFromChildLambda ",input_param)
+    return input_param
+
+
+
+Second lambda code
+import json
+
+def lambda_handler(event, context):
+    
+    
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    price = getCarPrice(carName, condition, howold)
+    print("Car Price : ",price)
+    
+    return {
+        'carName' :  carName,
+        'condition' : condition,
+        'howold' :  howold,
+        'price' : price  
+    }
+
+
+def getCarPrice(carName, condition, howold):
+    print(carName, " ", condition, " ", howold)
+   
+    if ( carName == "Honda" and condition == "good" and int(howold) <= 5 ):
+        return "7 Lakh"
+    elif(carName == "Honda" and condition == "good" and int(howold) > 5):
+        return "5 Lakh"
+    else:
+        return "2 Lakh"
+
+
+Step function
+
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "First",
+  "States": {
+    "First": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-2:876347804953:function:parent-lambda",
+      "Next": "Second"
+    },
+    "Second": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-2:876347804953:function:child-lambda",
+      "End": true
+    }
+  }
+}
+
+
+
+---- Now change to First Lambda
+
+
+import json
+
+def lambda_handler(event, context):
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    print("From Parent Lambda ",carName, " ", condition, " ", howold)
+    
+    input_param = {
+        "carName" : carName,
+        "condition" : condition,
+        "howold" : howold
+    }
+    
+   
+        
+   
+    print("responseFromChildLambda ",input_param)
+    return input_param
+
+
+
+
+
+
+Test step function 
+
+{
+  "carName": "Honda",
+  "condition": "good",
+  "howold": "4"
+}
+

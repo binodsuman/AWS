@@ -1,0 +1,100 @@
+
+First Example
+
+
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Hello",
+  "States": {
+    "Hello": {
+      "Type": "Pass",
+      "Result": "Hello",
+      "Next": "World"
+    },
+    "World": {
+      "Type": "Pass",
+      "Result": "World",
+      "Next": "Test"
+    },
+    "Test": {
+      "Type": "Pass",
+      "Result": "World",
+      "End": true
+    }
+  }
+}
+
+
+
+Second Example
+
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "First",
+  "States": {
+    "First": {
+      "Type": "Parallel",
+      "End": true,
+      "Branches" : [{
+         "StartAt": "Second",
+          "States" : {
+            "Second": {
+                "Type": "Pass",
+                "Result": "World",
+                "End": true
+              }
+          }
+      },{
+        "StartAt": "Third",
+          "States" : {
+            "Third": {
+                "Type": "Pass",
+                "Result": "World",
+                "End": true
+              }
+          }
+      }
+    ]
+    } 
+  }
+}
+
+Third Example
+
+--------------
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Trigger",
+  "States": {
+    "Trigger": {
+                "Type": "Pass",
+                "Result": "World",
+                "Next": "First"
+     },
+    "First": {
+      "Type": "Parallel",
+      "End": true,
+      "Branches" : [{
+         "StartAt": "Second",
+          "States" : {
+            "Second": {
+                "Type": "Pass",
+                "Result": "World",
+                "End": true
+              }
+          }
+      },{
+        "StartAt": "Third",
+          "States" : {
+            "Third": {
+                "Type": "Pass",
+                "Result": "World",
+                "End": true
+              }
+          }
+      }
+    ]
+    } 
+  }
+}
+
