@@ -1,0 +1,264 @@
+Child Lambda
+
+Role
+AWSLambdaBasicExecutionRole
+AWSLambdaRole
+
+
+import json
+
+def lambda_handler(event, context):
+    # TODO implement
+    # Getting from Parent Lambda
+    
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    price = getCarPrice(carName, condition, howold)
+    print("Car Price : ",price)
+    
+    return {
+        'carName' :  carName,
+        'condition' : condition,
+        'howold' :  howold,
+        'price' : price  
+    }
+    
+    
+def getCarPrice(carName, condition, howold):
+    print(carName, " ", condition, " ", howold)
+   
+    if ( carName == "Honda" and condition == "good" and int(howold) <= 5 ):
+        return "7 Lakh"
+    elif(carName == "Honda" and condition == "good" and int(howold) > 5):
+        return "5 Lakh"
+    else:
+        return "2 Lakh"
+
+
+
+Test
+
+{
+  "carName": "Honda",
+  "condition": "good",
+  "howold": "4"
+}
+
+Parent Lambda
+
+import json
+import boto3
+
+lambda_client = boto3.client('lambda')
+
+def lambda_handler(event, context):
+    # TODO implement
+    input_param = {
+        "carName" : "Honda",
+        "condition" : "good",
+        "howold" : "5"
+    }
+    
+    response = lambda_client.invoke(
+        FunctionName = 'arn:aws:lambda:us-east-2:876347804953:function:child-lambda',
+        InvocationType = 'RequestResponse',
+        Payload = json.dumps(input_param)
+        )
+        
+    responseFromChildLambda = json.load(response['Payload'])
+    print("responseFromChildLambda ",responseFromChildLambda)
+    return responseFromChildLambda
+
+
+
+---------
+
+import json
+import boto3
+
+lambda_client = boto3.client('lambda')
+
+def lambda_handler(event, context):
+    
+    
+    carName = event['queryStringParameters']['carName']
+    condition = event['queryStringParameters']['condition']
+    howold = event['queryStringParameters']['howold']
+    
+    print("From Parent Lambda ",carName, " ", condition, " ", howold)
+    
+    input_param = {
+        "carName" : carName,
+        "condition" : condition,
+        "howold" : howold
+    }
+    
+// https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html#Lambda.Client.invoke
+
+
+    response = lambda_client.invoke(
+        FunctionName = 'arn:aws:lambda:us-east-2:876347804953:function:child-lambda',
+        InvocationType = 'RequestResponse',
+        Payload = json.dumps(input_param)
+    )
+    
+    responseFromChildLambda = json.load(response['Payload'])
+    print("responseFromChildLambda ",responseFromChildLambda)
+    # return responseFromChildLambda
+    return {
+    #'statusCode': 200,
+    'body': json.dumps(responseFromChildLambda)
+   }
+
+
+?carName=Tata&condition=good&howold=5
+
+
+
+------
+
+Role for Lambda (LambdaBasic and cloudwatchfull)
+Role for step function
+
+Step Function
+Role add
+Choose step function and add AWSLambdaRole 
+
+Parent lambda
+
+import json
+
+def lambda_handler(event, context):
+    # TODO implement
+    input_param = {
+        "carName" : "Honda",
+        "condition" : "good",
+        "howold" : "5"
+    }
+    print("responseFromChildLambda ",input_param)
+    return input_param
+
+
+
+Child lambda
+import json
+
+def lambda_handler(event, context):
+    
+    
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    price = getCarPrice(carName, condition, howold)
+    print("Car Price : ",price)
+    
+    return {
+        'carName' :  carName,
+        'condition' : condition,
+        'howold' :  howold,
+        'price' : price  
+    }
+
+
+def getCarPrice(carName, condition, howold):
+    print(carName, " ", condition, " ", howold)
+   
+    if ( carName == "Honda" and condition == "good" and int(howold) <= 5 ):
+        return "7 Lakh"
+    elif(carName == "Honda" and condition == "good" and int(howold) > 5):
+        return "5 Lakh"
+    else:
+        return "2 Lakh"
+
+
+Step function
+
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Hello",
+  "States": {
+    "Hello": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-2:876347804953:function:parent-lambda",
+      "Next": "World"
+    },
+    "World": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-2:876347804953:function:child-lambda",
+      "End": true
+    }
+  }
+}
+
+
+
+---- Now change to Parent
+
+
+import json
+
+def lambda_handler(event, context):
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    print("From Parent Lambda ",carName, " ", condition, " ", howold)
+    
+    input_param = {
+        "carName" : carName,
+        "condition" : condition,
+        "howold" : howold
+    }
+    
+   
+        
+   
+    print("responseFromChildLambda ",input_param)
+    return input_param
+
+
+
+CHILD
+import json
+
+def lambda_handler(event, context):
+    
+    print("Event in child : ", event)
+    carName = event['carName']
+    condition = event['condition']
+    howold = event['howold']
+    
+    price = getCarPrice(carName, condition, howold)
+    print("Car Price : ",price)
+    
+    return {
+        'carName' :  carName,
+        'condition' : condition,
+        'howold' :  howold,
+        'price' : price  
+    }
+
+
+def getCarPrice(carName, condition, howold):
+    print(carName, " ", condition, " ", howold)
+   
+    if ( carName == "Honda" and condition == "good" and int(howold) <= 5 ):
+        return "7 Lakh"
+    elif(carName == "Honda" and condition == "good" and int(howold) > 5):
+        return "5 Lakh"
+    else:
+        return "2 Lakh"
+
+
+
+
+Test step function 
+
+{
+  "carName": "Honda",
+  "condition": "good",
+  "howold": "4"
+}
